@@ -37,6 +37,11 @@ canvas.height = 120;
 
 snapshotButton.onclick = function() {
   canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  let dataURI = canvas.toDataURL('image/jpeg');
+  if (dataURI) {
+    dc.send(dataURI);
+    addMSG(dataURI, "me");
+  }
 };
 
 const constraints = {
