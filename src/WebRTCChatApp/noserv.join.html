@@ -68,7 +68,7 @@ pc.onicecandidate = function(e) {
 pc.oniceconnectionstatechange = function(e) {
   var state = pc.iceConnectionState
   $('#status').html(state);
-  if (state == "connected") $("#msg, #send").attr("disabled", false);
+  if (state == "connected") $("#msg, #send, #snapshot").attr("disabled", false);
 };
 
 function dcInit(dc) {
