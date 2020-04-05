@@ -91,7 +91,12 @@ var addMSG = function(msg, who) {
   var wrap = $("<div>").addClass("wrap").appendTo($("#chat-screen"));
   var div  = $("<div>").addClass(who).appendTo(wrap);
   $("<span>").html(who).addClass("who").appendTo(div);
-  $("<span>").html(msg).addClass("msg").appendTo(div);
+
+  if (msg.indexOf("data:image") !== -1) {
+    $("<img>").attr('src', msg).addClass("msg-img").appendTo(div);
+  } else {
+    $("<span>").html(msg).addClass("msg").appendTo(div);
+  }
   $("#chat-screen-wp").scrollTop($("#chat-screen").height());
 }
 
