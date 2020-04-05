@@ -22,12 +22,14 @@
 </div>
 <h3> CAMERA </h3>
 <video playsinline autoplay></video>
+<button id="snapshot" disabled>Send snapshot</button>
 <canvas></canvas>
 <script>
 //var server       = { urls: "stun:stun.l.google.com:19302" };
 var sdpConstraints = { optional: [{RtpDataChannels: true}]  };
 var pc = new RTCPeerConnection(null);
 var dc;
+const snapshotButton = document.querySelector('button#snapshot');
 
 pc.oniceconnectionstatechange = function(e) {
   var state = pc.iceConnectionState;
