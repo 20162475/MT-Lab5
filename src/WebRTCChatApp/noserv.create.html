@@ -35,6 +35,10 @@ const canvas = document.querySelector('canvas');
 canvas.width = 160;
 canvas.height = 120;
 
+snapshotButton.onclick = function() {
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+};
+
 const constraints = {
   audio: false,
   video: true
