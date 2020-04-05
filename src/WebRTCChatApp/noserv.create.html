@@ -5,6 +5,7 @@
   <title> CREATE WebRTC channel </title>
   <link href="noserv.css" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+  <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 </head>
 <body>
 <h2> CREATE WebRTC channel <span id="status"> init </span></h2>
@@ -19,16 +20,50 @@
   </div>
   <div id="ct"><input id="msg" disabled><button id="send" disabled>send</button></div>
 </div>
+<h3> CAMERA </h3>
+<video playsinline autoplay></video>
+<button id="snapshot" disabled>Send snapshot</button>
+<canvas></canvas>
 <script>
 //var server       = { urls: "stun:stun.l.google.com:19302" };
 var sdpConstraints = { optional: [{RtpDataChannels: true}]  };
 var pc = new RTCPeerConnection(null);
 var dc;
+const snapshotButton = document.querySelector('button#snapshot');
+const video = window.video = document.querySelector('video');
+const canvas = document.querySelector('canvas');
+canvas.width = 160;
+canvas.height = 120;
+
+snapshotButton.onclick = function() {
+  canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+  let dataURI = canvas.toDataURL('image/jpeg');
+  if (dataURI) {
+    dc.send(dataURI);
+    addMSG(dataURI, "me");
+  }
+};
+
+const constraints = {
+  audio: false,
+  video: true
+};
+
+function handleSuccess(stream) {
+  window.stream = stream;
+  video.srcObject = stream;
+}
+
+function handleError(error) {
+  console.log('Error: ', error.message, error.name);
+}
+
+navigator.mediaDevices.getUserMedia(constraints).then(handleSuccess).catch(handleError); // Get user video
 
 pc.oniceconnectionstatechange = function(e) {
   var state = pc.iceConnectionState;
   $('#status').html(state);
-  if (state == "connected") $("#msg, #send").attr("disabled", false);
+  if (state == "connected") $("#msg, #send, #snapshot").attr("disabled", false);
 };
 pc.onicecandidate = function(e) {
   if (e.candidate) return;
@@ -56,7 +91,12 @@ var addMSG = function(msg, who) {
   var wrap = $("<div>").addClass("wrap").appendTo($("#chat-screen"));
   var div  = $("<div>").addClass(who).appendTo(wrap);
   $("<span>").html(who).addClass("who").appendTo(div);
-  $("<span>").html(msg).addClass("msg").appendTo(div);
+
+  if (msg.indexOf("data:image") !== -1) {
+    $("<img>").attr('src', msg).addClass("msg-img").appendTo(div);
+  } else {
+    $("<span>").html(msg).addClass("msg").appendTo(div);
+  }
   $("#chat-screen-wp").scrollTop($("#chat-screen").height());
 }
 
@@ -70,6 +110,7 @@ var sendMSG = function() {
     $("#msg").val('');
   }
 }
+
 $("#start").click(function(){start();});
 $("#msg").keypress(function(e) {if(e.which == 13) {sendMSG()}});
 $("#send").click(sendMSG);
